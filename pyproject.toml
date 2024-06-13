@@ -1,0 +1,31 @@
+[project]
+name = "wood-ball"
+version = "0.1.0"
+description = "Add a short description here"
+authors = [{name = "Cole", email = "cwood0107@gmail.com"}]
+requires-python = ">= 3.11"
+dependencies = ["nba-api"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["win-64"]
+
+[tool.pixi.pypi-dependencies]
+wood-ball = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+rich = ">=13.7.1,<13.8"
+typer = ">=0.12.3,<0.13"
+numpy = ">=1.26.4,<1.27"
+plotly = ">=5.22.0,<5.23"
+matplotlib = ">=3.8.4,<3.9"
+pandas = ">=2.2.2,<2.3"
+ipykernel = ">=6.29.4,<6.30"
+nbformat = ">=5.10.4,<5.11"
+plottable = ">=0.1.5,<0.2"
