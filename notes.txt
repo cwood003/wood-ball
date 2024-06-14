@@ -1,0 +1,123 @@
+Writing Analysis Subjects:
+- Player clustering based on career statsictics, All star appearances, awrads, etc
+- Composite all in one player performance scorecard like Owen made. Olympic team, Pelicans Season in review
+- Complete shot tools PerThirtySix
+- Generally replciate the work Owen has done in the past
+- Include odds from vegas for change in consensus, how and when do the odds change and how right they were related to (draft specific)
+
+{
+   "id":"7c66e6cf069aa52be1dd7eaa47488403",
+   "has_outrights":true,
+   "sport_key":"basketball_nba_championship_winner",
+   "sport_title":"NBA Championship Winner",
+   "commence_time":"2024-06-19T22:00:15Z",
+   "home_team":"None",
+   "away_team":"None",
+   "bookmakers":[
+      {
+         "key":"draftkings",
+         "title":"DraftKings",
+         "last_update":"2024-06-14T03:23:22Z",
+         "markets":[
+            {
+               "key":"outrights",
+               "last_update":"2024-06-14T03:23:22Z",
+               "outcomes":[
+                  {
+                     "name":"Boston Celtics",
+                     "price":1.03
+                  },
+                  {
+                     "name":"Dallas Mavericks",
+                     "price":18.0
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "key":"betrivers",
+         "title":"BetRivers",
+         "last_update":"2024-06-14T03:25:25Z",
+         "markets":[
+            {
+               "key":"outrights",
+               "last_update":"2024-06-14T03:25:25Z",
+               "outcomes":[
+                  {
+                     "name":"Boston Celtics",
+                     "price":1.01
+                  },
+                  {
+                     "name":"Dallas Mavericks",
+                     "price":21.0
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "key":"bovada",
+         "title":"Bovada",
+         "last_update":"2024-06-14T03:21:53Z",
+         "markets":[
+            {
+               "key":"outrights",
+               "last_update":"2024-06-14T03:21:53Z",
+               "outcomes":[
+                  {
+                     "name":"Boston Celtics",
+                     "price":1.02
+                  },
+                  {
+                     "name":"Dallas Mavericks",
+                     "price":14.0
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "key":"williamhill_us",
+         "title":"Caesars",
+         "last_update":"2024-06-14T03:21:53Z",
+         "markets":[
+            {
+               "key":"outrights",
+               "last_update":"2024-06-14T03:21:53Z",
+               "outcomes":[
+                  {
+                     "name":"Boston Celtics",
+                     "price":1.01
+                  },
+                  {
+                     "name":"Dallas Mavericks",
+                     "price":21.0
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "key":"betmgm",
+         "title":"BetMGM",
+         "last_update":"2024-06-14T03:18:56Z",
+         "markets":[
+            {
+               "key":"outrights",
+               "last_update":"2024-06-14T03:18:56Z",
+               "outcomes":[
+                  {
+                     "name":"Boston Celtics",
+                     "price":1.01
+                  },
+                  {
+                     "name":"Dallas Mavericks",
+                     "price":21.0
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}
