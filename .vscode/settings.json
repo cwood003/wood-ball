@@ -1,0 +1,11 @@
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "DuckDB",
+            "database": "X:\\nba_data\\odds_data\\odds.db",
+            "name": "odds"
+        }
+    ]
+}

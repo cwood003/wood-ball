@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Add a short description here"
 authors = [{name = "Cole", email = "cwood0107@gmail.com"}]
 requires-python = ">= 3.11"
-dependencies = ["nba-api", "basketball-reference-web-scraper"]
+dependencies = ["nba-api", "basketball-reference-web-scraper", "magic-duckdb"]
 
 [build-system]
 requires = ["setuptools"]
@@ -31,3 +31,5 @@ nbformat = ">=5.10.4,<5.11"
 plottable = ">=0.1.5,<0.2"
 duckdb = ">=1.0.0,<1.1"
 requests = ">=2.32.3,<2.33"
+jupysql = ">=0.10.9,<0.11"
+scikit-learn = ">=1.5.0,<1.6"
