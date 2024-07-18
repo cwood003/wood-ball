@@ -4241,7 +4241,7 @@ packages:
   name: wood-ball
   version: 0.1.0
   path: .
-  sha256: 07472e5e615f7ac0cad7e4a15132da1f7d0ee6d401c55c4e5839cc0ddea816ff
+  sha256: 6f65da6be3b23a8d407ee8f992926e7f08087c5384378d13430f63e9b57a135b
   requires_dist:
   - nba-api
   - basketball-reference-web-scraper

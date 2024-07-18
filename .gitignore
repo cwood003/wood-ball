@@ -1,4 +1,6 @@
 # pixi environments
+# pixi environments
 .pixi
 *.egg-info
 creds.py
+__pycache__/
