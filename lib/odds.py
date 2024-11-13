@@ -2,6 +2,7 @@ import requests
 from lib.creds import odds_api_key
 import pandas as pd
 from rich import print
+import duckdb
 
 class Odds:
     def __init__(self):
@@ -48,6 +49,10 @@ class Odds:
             odds_json = odds_response.json()
             print('Number of events:', len(odds_json))
 
+            # Check the usage quota
+            print('Remaining requests', odds_response.headers['x-requests-remaining'])
+            print('Used requests', odds_response.headers['x-requests-used'])
+
         odds_meta = [
             ['id'],
             ['has_outrights'],
@@ -67,3 +72,75 @@ class Odds:
                     meta=odds_meta, sep='_'
                     )
         return df
+    
+    def get_ncaa_champ_odds(self):
+
+        sport = 'basketball_ncaa_championship_winner'
+        odds_response = requests.get(
+            f'https://api.the-odds-api.com/v4/sports/{sport}/odds',
+            params={
+                'api_key': self.API_KEY,
+                'regions': 'us',
+                'markets': 'outrights',
+                'oddsFormat': 'decimal',
+                'dateFormat': 'iso',
+            }
+        )
+
+        if odds_response.status_code != 200:
+            print(f'Failed to get odds: status_code {odds_response.status_code}, response body {odds_response.text}')
+
+        else:
+            odds_json = odds_response.json()
+            print('Number of events:', len(odds_json))
+
+            # Check the usage quota
+            print('Remaining requests', odds_response.headers['x-requests-remaining'])
+            print('Used requests', odds_response.headers['x-requests-used'])
+
+        odds_meta = [
+            ['id'],
+            ['has_outrights'],
+            ['sport_key'],
+            ['sport_title'],
+            ['commence_time'],
+            ['home_team'],
+            ['away_team'],
+            ['bookmakers', 'key'],
+            ['bookmakers', 'title'],
+            ['bookmakers', 'last_update'],
+            ['bookmakers', 'markets', 'key'],
+            ['bookmakers', 'markets', 'last_update']
+        ]
+
+        df = pd.json_normalize(odds_json, record_path=['bookmakers', 'markets', 'outcomes'], 
+                    meta=odds_meta, sep='_'
+                    )
+        return df
+    
+    def append_to_table(df, table_name, db_path='X:\\nba_data\\odds_data\\odds.db'):
+        """
+        Appends data from a DataFrame to the ncaa_champ_odds table in the DuckDB database.
+
+        Parameters:
+        df (pd.DataFrame): The DataFrame containing the data to append.
+        db_path (str): The path to the DuckDB database file.
+        """
+
+        df['load_date'] = pd.to_datetime('today').strftime("%Y-%m-%d")
+        # Connect to the DuckDB database
+        conn = duckdb.connect(db_path)
+        
+        # Check if the ncaa_champ_odds table exists
+        table_exists = conn.execute(f"SELECT * FROM information_schema.tables WHERE table_name = {table_name}").fetchone()
+        
+        if table_exists:
+            # Append the data to the ncaa_champ_odds table
+            conn.execute(f"INSERT INTO {table_name} SELECT * FROM df")
+            print("Data appended successfully.")
+        else:
+            conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM df")
+            print(f"Table {table_name} does not exist. Created table from DF")
+        
+        # Close the connection
+        conn.close()
