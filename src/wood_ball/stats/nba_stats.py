@@ -53,34 +53,24 @@ class NBA_Stats:
         return game_log_list
 
 
-    # def get_box_scores(self, season_type_all_star="Regular Season", date_from="12-10-2024",date_to="12-10-2024"):
+    def get_box_scores(self, game_id_list, box_score_type, box_score_subtype):
 
-    #     game_log = leaguegamelog.LeagueGameLog(
-    #         season_type_all_star=season_type_all_star,
-    #         date_from_nullable=date_from,
-    #         date_to_nullable=date_to,
-    #     )
-
-    #     game_log_df = pl.DataFrame(game_log.get_normalized_dict()["LeagueGameLog"])
-    #     game_id_list = game_log_df.select('GAME_ID').unique()['GAME_ID'].to_list()
-
-    #     box_score_advanced_obj_list = [boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id) for game_id in game_id_list]
-    #     trad_box_score_obj_list = [boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id) for game_id in game_id_list]
-
-    #     box_score_player_stats = pl.DataFrame(
-    #         [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
-    #     )
-    #     box_score_team_stats = pl.DataFrame(
-    #         [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
-    #     )
-
-    #     trad_box_score_player_stats = pl.DataFrame(
-    #         [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
-    #     )
-
-    #     trad_box_score_team_stats = pl.DataFrame(
-    #         [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
-    #     )
+        if box_score_type == 'adv':
+            box_score_advanced_obj_list = [boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id) for game_id in game_id_list]
+            if box_score_subtype == 'player':
+                box_score_player_stats = [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
+                return box_score_player_stats
+            elif box_score_subtype == 'team':
+                box_score_team_stats = [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
+                return box_score_team_stats
+        elif box_score_type == 'trad':
+            trad_box_score_obj_list = [boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id) for game_id in game_id_list]
+            if box_score_subtype == 'player':
+                trad_box_score_player_stats = [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
+                return trad_box_score_player_stats
+            elif box_score_subtype == 'team':
+                trad_box_score_team_stats = [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
+                return trad_box_score_team_stats
 
     def get_shot_chart(self, player_id, team_id, year, season_type="Regular Season", context_measure_simple="FGA"):
         """

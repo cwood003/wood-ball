@@ -18,7 +18,180 @@ def _():
     import wat
     from great_tables import GT, style, loc, google_font
     from wood_ball.library.static.icon_ref import icon_ref
-    return GT, duckdb, google_font, icon_ref, loc, mo, pl, style, wat
+    from wood_ball.stats.nba_stats import NBA_Stats
+    return (
+        GT,
+        NBA_Stats,
+        duckdb,
+        google_font,
+        icon_ref,
+        loc,
+        mo,
+        pl,
+        style,
+        wat,
+    )
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        ATTACH 'X:/nba_data/my_db.duckdb' as my_db
+        """
+    )
+    return (my_db,)
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        show all tables
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo, my_db, nba_game_log):
+    _df = mo.sql(
+        f"""
+        select * from my_db.nba_game_log
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        alter table my_db.nba_game_log alter GAME_DATE TYPE DATE
+        """
+    )
+    return
+
+
+app._unparsable_cell(
+    r"""
+    create or replace table 
+    """,
+    name="_"
+)
+
+
+@app.cell
+def _(con):
+    con.close()
+    return
+
+
+@app.cell
+def _(NBA_Stats):
+    stats = NBA_Stats()
+    return (stats,)
+
+
+@app.cell
+def _(mo, nba_db, nba_game_log):
+    game_log_df = mo.sql(
+        f"""
+        select * from nba_db.nba_game_log
+        """
+    )
+    return (game_log_df,)
+
+
+@app.cell
+def _(game_log_df, pl, stats):
+    # this needs to be edited
+
+    game_id_list = game_log_df['GAME_ID'].unique().to_list()
+
+    box_adv_players = pl.DataFrame(stats.get_box_scores(game_id_list, 'adv', 'player'))
+    return box_adv_players, game_id_list
+
+
+@app.cell
+def _(box_adv_players, mo):
+    _df = mo.sql(
+        f"""
+        INSERT OR REPLACE INTO my_db.box_adv_player
+        select * from box_adv_players
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        show all tables
+        """
+    )
+    return
+
+
+@app.cell
+def _(duckdb):
+    con = duckdb.connect('md:?motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN3b29kMDEwN0BnbWFpbC5jb20iLCJzZXNzaW9uIjoiY3dvb2QwMTA3LmdtYWlsLmNvbSIsInBhdCI6IkxxVS1PWkV3NUpQLWM5NHNCNmJSNFZDWXhRMUhiM05SNnVHZXFKcWIyczAiLCJ1c2VySWQiOiIwYTMzZGI5OC0xZGY1LTQxY2QtODRkOC0zZDAxNGU5NmFlZTUiLCJpc3MiOiJtZF9wYXQiLCJyZWFkT25seSI6ZmFsc2UsInRva2VuVHlwZSI6InJlYWRfd3JpdGUiLCJpYXQiOjE3MzQ0OTY0MjUsImV4cCI6MTczNDU4MjgyNX0.xPKNWhUiubUdDK6lhD1Ck1YP-OtCn2Z2ioEE7H4HZ78')
+    return (con,)
+
+
+@app.cell
+def _(con):
+    con.sql("""
+        CREATE OR REPLACE DATABASE test_db_2 from current_database(); 
+    """)
+    return
+
+
+@app.cell
+def _(con, conn):
+    con.sql("""
+        show all tables; 
+    """)
+
+    conn.close()
+    return
+
+
+@app.cell
+def _(con):
+    con.close()
+    return
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        CREATE OR REPLACE DATABASE test_1 from current_database();
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        show all tables
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        CREATE DATABASE nba_data from nba_db;
+        """
+    )
+    return
 
 
 @app.cell
@@ -66,113 +239,26 @@ def _(GT, google_font, loc, style):
 
 
 @app.cell
-def _():
-    from nba_api.stats.endpoints import shotchartdetail, commonplayerinfo, teaminfocommon, boxscoreadvancedv2, leaguegamelog, boxscoretraditionalv2
-    return (
-        boxscoreadvancedv2,
-        boxscoretraditionalv2,
-        commonplayerinfo,
-        leaguegamelog,
-        shotchartdetail,
-        teaminfocommon,
-    )
-
-
-@app.cell
-def _(leaguegamelog):
-    game_log = leaguegamelog.LeagueGameLog(
-        season_type_all_star="Regular Season",
-        date_from_nullable="12-10-2024",
-        date_to_nullable="12-10-2024",
-    )
-    return (game_log,)
-
-
-@app.cell
-def _(game_log, l):
-    game_log = game_log.get_normalized_dict()["LeagueGameLog"]
-    game_id_list = list(set([game_log['GAME_ID'] for d in l if 'value' in d]))
-    # game_id_list = game_log_df.select('GAME_ID').unique()['GAME_ID'].to_list()
-    return game_id_list, game_log
-
-
-@app.cell
-def _(game_log_temp, wat):
-    wat / game_log_temp
+def _(game_log_dict, pl):
+    pl.DataFrame(game_log_dict)['GAME_ID'].unique().to_list()
     return
 
 
 @app.cell
-def _():
-    # game_id_list = game_log_df.select('GAME_ID').unique()['GAME_ID'].to_list()
-    return
+def _(trad_box_score_team_stats):
+    # polars dataframe schema conversion
+    def convert_df_to_duckdb_schema(df):
+        ref_dict = {
+            'String': "STRING",
+            "Float64": "DOUBLE",
+            "Int64": "BIGINT"
+        }
 
+        for key, value in df.schema.items():
+            print((str(key) + ' ' + ref_dict[str(value)] + ','))
 
-@app.cell
-def _(boxscoreadvancedv2, boxscoretraditionalv2, game_id_list):
-    box_score_advanced_obj_list = [boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id) for game_id in game_id_list]
-    trad_box_score_obj_list = [boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id) for game_id in game_id_list]
-    return box_score_advanced_obj_list, trad_box_score_obj_list
-
-
-@app.cell
-def _(box_score_advanced_obj_list, pl, trad_box_score_obj_list):
-    box_score_player_stats = pl.DataFrame(
-        [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
-    )
-    box_score_team_stats = pl.DataFrame(
-        [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
-    )
-
-    trad_box_score_player_stats = pl.DataFrame(
-        [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
-    )
-
-    trad_box_score_team_stats = pl.DataFrame(
-        [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
-    )
-    return (
-        box_score_player_stats,
-        box_score_team_stats,
-        trad_box_score_player_stats,
-        trad_box_score_team_stats,
-    )
-
-
-@app.cell
-def _(icon_ref, pl):
-    png_ref = pl.DataFrame(icon_ref)
-    return (png_ref,)
-
-
-@app.cell
-def _(duckdb):
-    con = duckdb.connect('X:/nba_data/my_db.duckdb')
-    return (con,)
-
-
-@app.cell
-def _(con):
-    con.sql("""
-    show tables
-    """)
-    return
-
-
-@app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        select * from trad_box_score_player_stats
-
-        select * from trad_box_score_team_stats
-
-        select * from box_score_player_stats
-
-        select * from box_score_team_stats
-        """
-    )
-    return
+    convert_df_to_duckdb_schema(trad_box_score_team_stats)
+    return (convert_df_to_duckdb_schema,)
 
 
 @app.cell
