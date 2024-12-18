@@ -1,10 +1,10 @@
 # Dependencies
-from nba_api.stats.endpoints import shotchartdetail, commonplayerinfo, teaminfocommon, boxscoreadvancedv2, leaguegamelog
+from nba_api.stats.endpoints import shotchartdetail, commonplayerinfo, teaminfocommon, boxscoreadvancedv2, leaguegamelog, boxscoretraditionalv2
 from nba_api.stats.static import players, teams
-import lib.draw_hex_chart as draw_hex_chart
-from rich.panel import Panel
-from rich.text import Text
-from rich.console import Console
+# import lib.draw_hex_chart as draw_hex_chart
+# from rich.panel import Panel
+# from rich.text import Text
+# from rich.console import Console
 
 class NBA_Stats:
     """
@@ -41,11 +41,46 @@ class NBA_Stats:
 
         return boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id)
 
-    def get_game_log(self):
+    def get_game_log(self, season_type_all_star="Regular Season", date_from="12-10-2024",date_to="12-10-2024"):
         
-        response_json = leaguegamelog.LeagueGameLog(season_type_all_star='Regular Season', date_from_nullable='', date_to_nullable='')
+        game_log = leaguegamelog.LeagueGameLog(
+            season_type_all_star=season_type_all_star,
+            date_from_nullable=date_from,
+            date_to_nullable=date_to,
+        )
 
-        return response_json
+        game_log_list = game_log.get_normalized_dict()["LeagueGameLog"]
+        return game_log_list
+
+
+    # def get_box_scores(self, season_type_all_star="Regular Season", date_from="12-10-2024",date_to="12-10-2024"):
+
+    #     game_log = leaguegamelog.LeagueGameLog(
+    #         season_type_all_star=season_type_all_star,
+    #         date_from_nullable=date_from,
+    #         date_to_nullable=date_to,
+    #     )
+
+    #     game_log_df = pl.DataFrame(game_log.get_normalized_dict()["LeagueGameLog"])
+    #     game_id_list = game_log_df.select('GAME_ID').unique()['GAME_ID'].to_list()
+
+    #     box_score_advanced_obj_list = [boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id) for game_id in game_id_list]
+    #     trad_box_score_obj_list = [boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id) for game_id in game_id_list]
+
+    #     box_score_player_stats = pl.DataFrame(
+    #         [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
+    #     )
+    #     box_score_team_stats = pl.DataFrame(
+    #         [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
+    #     )
+
+    #     trad_box_score_player_stats = pl.DataFrame(
+    #         [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
+    #     )
+
+    #     trad_box_score_team_stats = pl.DataFrame(
+    #         [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
+    #     )
 
     def get_shot_chart(self, player_id, team_id, year, season_type="Regular Season", context_measure_simple="FGA"):
         """
@@ -66,21 +101,21 @@ class NBA_Stats:
         league_average = shot_chart.league_averages.get_data_frame().rename(columns={'FGA': 'FGA_LA', 'FGM': 'FGM_LA', 'FG_PCT': 'FG_PCT_LA'})
         return shot_chart.shot_chart_detail.get_data_frame(), league_average
     
-    def hex_shot_chart(self, player_name="Brandon Ingram", team_nickname="Pelicans", season="2023-24"):
-        """
-        Generates a shot chart for a given player and season using hexagons ala Kirk Goldsberry.
+    # def hex_shot_chart(self, player_name="Brandon Ingram", team_nickname="Pelicans", season="2023-24"):
+    #     """
+    #     Generates a shot chart for a given player and season using hexagons ala Kirk Goldsberry.
 
-        Args:
-            player_name (str, optional): The name of the player. Defaults to "Brandon Ingram".
-            season (str, optional): The season year (e.g., "2023-24"). Defaults to "2023-24".
-        """
-        try:
-            player_id, player_info = self.get_player_info(player_name)
-            team_id = self.get_team_id(team_nickname)
+    #     Args:
+    #         player_name (str, optional): The name of the player. Defaults to "Brandon Ingram".
+    #         season (str, optional): The season year (e.g., "2023-24"). Defaults to "2023-24".
+    #     """
+    #     try:
+    #         player_id, player_info = self.get_player_info(player_name)
+    #         team_id = self.get_team_id(team_nickname)
             
-            bi, league_average = self.get_shot_chart(player_id, team_id, season)
-            draw_hex_chart.hex_shot_chart(player_name, player_id, team_id, player_info, bi, league_average, season)
-        except Exception as e:
-            error_message = Text(f"Unable to retrieve player info using {player_name}: {e}", style="bold red")
-            console = Console()
-            console.print(Panel(error_message, title="Error", border_style="bold red"))
+    #         bi, league_average = self.get_shot_chart(player_id, team_id, season)
+    #         draw_hex_chart.hex_shot_chart(player_name, player_id, team_id, player_info, bi, league_average, season)
+    #     except Exception as e:
+    #         error_message = Text(f"Unable to retrieve player info using {player_name}: {e}", style="bold red")
+    #         console = Console()
+    #         console.print(Panel(error_message, title="Error", border_style="bold red"))

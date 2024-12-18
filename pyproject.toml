@@ -12,6 +12,7 @@ dependencies = [
     "great-tables>=0.15.0",
     "nba-api>=1.6.1",
     "polars>=1.17.1",
+    "pyarrow>=18.1.0",
 ]
 
 [build-system]
@@ -22,4 +23,5 @@ build-backend = "hatchling.build"
 dev = [
     "marimo>=0.10.4",
     "ruff>=0.8.3",
+    "wat-inspector>=0.4.3",
 ]
