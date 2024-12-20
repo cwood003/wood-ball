@@ -25,7 +25,7 @@ class NBA_Stats:
         player_info = commonplayerinfo.CommonPlayerInfo(player_id=player_id)
         return player_id, player_info.get_normalized_dict()
     
-    def get_team_id(self, team_nickname):
+    def get_team_id(self, team_nickname: str) -> str:
         """
         Retrieves the team ID for a given team nickname.
 
@@ -41,7 +41,7 @@ class NBA_Stats:
 
         return boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id)
 
-    def get_game_log(self, season_type_all_star="Regular Season", date_from="12-10-2024",date_to="12-10-2024"):
+    def get_game_log(self, season_type_all_star: str="Regular Season", date_from:str = "12-10-2024",date_to:str = "12-10-2024"):
         
         game_log = leaguegamelog.LeagueGameLog(
             season_type_all_star=season_type_all_star,
@@ -53,7 +53,7 @@ class NBA_Stats:
         return game_log_list
 
 
-    def get_box_scores(self, game_id_list, box_score_type, box_score_subtype):
+    def get_box_scores(self, game_id_list: list, box_score_type: str = ['adv', 'trad'], box_score_subtype: str = ['player', 'team']):
 
         if box_score_type == 'adv':
             box_score_advanced_obj_list = [boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id) for game_id in game_id_list]
