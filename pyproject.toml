@@ -22,6 +22,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "marimo>=0.10.4",
+    "nba-on-court>=0.2.1",
     "ruff>=0.8.3",
     "wat-inspector>=0.4.3",
 ]
