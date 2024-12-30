@@ -1,6 +1,6 @@
 import typer
 from rich import print
-from lib.nba_stats import NBA_Stats
+from wood_ball.stats.nba_stats import NBA_Stats
 from typing_extensions import Annotated as An
 from typing import Optional
 
@@ -17,6 +17,9 @@ def hello():
 def hex_shot_chart(player_name:  An[str, typer.Argument(help="NBA full player name")] = "Brandon Ingram", season: An[str, typer.Argument(help="NBA Season Name")] = "2023-24"):
     stats = NBA_Stats()
     stats.hex_shot_chart(player_name, season)
+
+@app.command()
+def 
 
 if __name__ == "__main__":
     app()

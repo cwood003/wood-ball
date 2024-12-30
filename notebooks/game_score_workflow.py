@@ -13,7 +13,7 @@ def _():
     import duckdb
     # import pygwalker
     import polars as pl
-    # import plotly
+    import plotly
     import marimo as mo
     import wat
     from great_tables import GT, style, loc, google_font
@@ -28,63 +28,10 @@ def _():
         loc,
         mo,
         pl,
+        plotly,
         style,
         wat,
     )
-
-
-@app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        ATTACH 'X:/nba_data/my_db.duckdb' as my_db
-        """
-    )
-    return (my_db,)
-
-
-@app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        show all tables
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo, my_db, nba_game_log):
-    _df = mo.sql(
-        f"""
-        select * from my_db.nba_game_log
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        alter table my_db.nba_game_log alter GAME_DATE TYPE DATE
-        """
-    )
-    return
-
-
-app._unparsable_cell(
-    r"""
-    create or replace table 
-    """,
-    name="_"
-)
-
-
-@app.cell
-def _(con):
-    con.close()
-    return
 
 
 @app.cell
@@ -94,67 +41,14 @@ def _(NBA_Stats):
 
 
 @app.cell
-def _(mo, nba_db, nba_game_log):
-    game_log_df = mo.sql(
-        f"""
-        select * from nba_db.nba_game_log
-        """
-    )
-    return (game_log_df,)
-
-
-@app.cell
-def _(game_log_df, pl, stats):
-    # this needs to be edited
-
-    game_id_list = game_log_df['GAME_ID'].unique().to_list()
-
-    box_adv_players = pl.DataFrame(stats.get_box_scores(game_id_list, 'adv', 'player'))
-    return box_adv_players, game_id_list
-
-
-@app.cell
-def _(box_adv_players, mo):
-    _df = mo.sql(
-        f"""
-        INSERT OR REPLACE INTO my_db.box_adv_player
-        select * from box_adv_players
-        """
-    )
+def _(stats):
+    stats.hex_shot_chart(player_name="Lamelo Ball", team_nickname='Hornets', season='2024-25')
     return
 
 
 @app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        show all tables
-        """
-    )
-    return
-
-
-@app.cell
-def _(duckdb):
-    con = duckdb.connect('md:?motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN3b29kMDEwN0BnbWFpbC5jb20iLCJzZXNzaW9uIjoiY3dvb2QwMTA3LmdtYWlsLmNvbSIsInBhdCI6IkxxVS1PWkV3NUpQLWM5NHNCNmJSNFZDWXhRMUhiM05SNnVHZXFKcWIyczAiLCJ1c2VySWQiOiIwYTMzZGI5OC0xZGY1LTQxY2QtODRkOC0zZDAxNGU5NmFlZTUiLCJpc3MiOiJtZF9wYXQiLCJyZWFkT25seSI6ZmFsc2UsInRva2VuVHlwZSI6InJlYWRfd3JpdGUiLCJpYXQiOjE3MzQ0OTY0MjUsImV4cCI6MTczNDU4MjgyNX0.xPKNWhUiubUdDK6lhD1Ck1YP-OtCn2Z2ioEE7H4HZ78')
-    return (con,)
-
-
-@app.cell
-def _(con):
-    con.sql("""
-        CREATE OR REPLACE DATABASE test_db_2 from current_database(); 
-    """)
-    return
-
-
-@app.cell
-def _(con, conn):
-    con.sql("""
-        show all tables; 
-    """)
-
-    conn.close()
+def _():
+    # con = duckdb.connect('md:?motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN3b29kMDEwN0BnbWFpbC5jb20iLCJzZXNzaW9uIjoiY3dvb2QwMTA3LmdtYWlsLmNvbSIsInBhdCI6IkhOVTBDdlBpdVh2VzJqeU80UnExV3RMUm1RN09FVTRybEowanhSV2ZMVDQiLCJ1c2VySWQiOiIwYTMzZGI5OC0xZGY1LTQxY2QtODRkOC0zZDAxNGU5NmFlZTUiLCJpc3MiOiJtZF9wYXQiLCJyZWFkT25seSI6ZmFsc2UsInRva2VuVHlwZSI6InJlYWRfd3JpdGUiLCJpYXQiOjE3MzUzOTkzMDN9.tK3gEbSK3Gpn5YtdIyqYd6ZNA2kMnU-re3Ew-RsgzQQ')
     return
 
 
@@ -165,32 +59,215 @@ def _(con):
 
 
 @app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        CREATE OR REPLACE DATABASE test_1 from current_database();
-        """
+def _(duckdb):
+    con = duckdb.connect('../nba_data.duckdb')
+    return (con,)
+
+
+@app.cell
+def _(pl, stats):
+    # get game_log
+    game_log_df = pl.DataFrame(stats.get_game_log(date_from="12-27-2024", date_to="12-30-2024"))
+    game_id_list = game_log_df['GAME_ID'].unique().to_list()
+    # this needs to be edited
+    box_adv_players, box_adv_team = stats.get_box_scores(game_id_list, 'adv')
+    box_trad_players, box_trad_team = stats.get_box_scores(game_id_list, 'trad')
+    return (
+        box_adv_players,
+        box_adv_team,
+        box_trad_players,
+        box_trad_team,
+        game_id_list,
+        game_log_df,
     )
+
+
+@app.cell
+def _(box_adv_players, box_adv_team, box_trad_players, box_trad_team, pl):
+    box_adv_players_df = pl.DataFrame(box_adv_players)
+    box_adv_team_df = pl.DataFrame(box_adv_team)
+
+    box_trad_players_df = pl.DataFrame(box_trad_players)
+    box_trad_team_df = pl.DataFrame(box_trad_team)
+    return (
+        box_adv_players_df,
+        box_adv_team_df,
+        box_trad_players_df,
+        box_trad_team_df,
+    )
+
+
+@app.cell
+def _(con):
+    con.sql("""
+    show all tables
+    """)
     return
 
 
 @app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        show all tables
-        """
-    )
+def _(con):
+    # insert new advanced box score data into motherduck
+    con.sql("""
+    INSERT OR REPLACE INTO nba_data.box_adv_player
+    select GAME_ID,TEAM_ID,TEAM_ABBREVIATION,TEAM_CITY,PLAYER_ID,PLAYER_NAME,NICKNAME,START_POSITION,COMMENT,MIN,E_OFF_RATING,OFF_RATING,E_DEF_RATING,DEF_RATING,E_NET_RATING,NET_RATING,AST_PCT,AST_TOV,AST_RATIO,OREB_PCT,DREB_PCT,REB_PCT,TM_TOV_PCT,EFG_PCT,TS_PCT,USG_PCT,E_USG_PCT,E_PACE,PACE,PACE_PER40,POSS,PIE
+    from box_adv_players_df
+    """)
     return
 
 
 @app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        CREATE DATABASE nba_data from nba_db;
-        """
-    )
+def _(con):
+    con.sql("""
+    INSERT OR REPLACE INTO nba_data.box_adv_team
+    select 
+    GAME_ID,
+        TEAM_ID,
+        TEAM_NAME,
+        TEAM_ABBREVIATION,
+        TEAM_CITY,
+        MIN,
+        E_OFF_RATING,
+        OFF_RATING,
+        E_DEF_RATING,
+        DEF_RATING,
+        E_NET_RATING,
+        NET_RATING,
+        AST_PCT,
+        AST_TOV,
+        AST_RATIO,
+        OREB_PCT,
+        DREB_PCT,
+        REB_PCT,
+        E_TM_TOV_PCT,
+        TM_TOV_PCT,
+        EFG_PCT,
+        TS_PCT,
+        USG_PCT,
+        E_USG_PCT,
+        E_PACE,
+        PACE,
+        PACE_PER40,
+        POSS,
+        PIE
+        from box_adv_team_df
+    """)
+    return
+
+
+@app.cell
+def _(con):
+    con.sql("""
+    INSERT OR REPLACE INTO nba_data.box_trad_player
+    select GAME_ID,
+        TEAM_ID,
+        TEAM_ABBREVIATION,
+        TEAM_CITY,
+        PLAYER_ID,
+        PLAYER_NAME,
+        NICKNAME,
+        START_POSITION,
+        COMMENT,
+        MIN,
+        FGM,
+        FGA,
+        FG_PCT,
+        FG3M,
+        FG3A,
+        FG3_PCT,
+        FTM,
+        FTA,
+        FT_PCT,
+        OREB,
+        DREB,
+        REB,
+        AST,
+        STL,
+        BLK,
+        "TO" as TOV,
+        PF,
+        PTS,
+        PLUS_MINUS
+        from box_trad_players_df
+        """)
+    return
+
+
+@app.cell
+def _(con):
+    con.sql("""
+    INSERT OR REPLACE INTO nba_data.box_trad_team
+    select 
+    GAME_ID,
+        TEAM_ID,
+        TEAM_NAME,
+        TEAM_ABBREVIATION,
+        TEAM_CITY,
+        MIN,
+        FGM,
+        FGA,
+        FG_PCT,
+        FG3M,
+        FG3A,
+        FG3_PCT,
+        FTM,
+        FTA,
+        FT_PCT,
+        OREB,
+        DREB,
+        REB,
+        AST,
+        STL,
+        BLK,
+        "TO" as TOV,
+        PF,
+        PTS,
+        PLUS_MINUS
+        from box_trad_team_df""")
+    return
+
+
+@app.cell
+def _(con):
+    con.sql("""
+    INSERT OR REPLACE INTO nba_data.nba_game_log
+    select SEASON_ID,
+        TEAM_ID,
+        TEAM_ABBREVIATION,
+        TEAM_NAME,
+        GAME_ID,
+        GAME_DATE,
+        MATCHUP,
+        WL,
+        MIN,
+        FGM,
+        FGA,
+        FG_PCT,
+        FG3M,
+        FG3A,
+        FG3_PCT,
+        FTM,
+        FTA,
+        FT_PCT,
+        OREB,
+        DREB,
+        REB,
+        AST,
+        STL,
+        BLK,
+        TOV,
+        PF,
+        PTS,
+        PLUS_MINUS,
+        VIDEO_AVAILABLE
+        from game_log_df
+        """)
+    return
+
+
+@app.cell
+def _(con):
+    con.close()
     return
 
 
@@ -204,8 +281,8 @@ def _(GT, google_font, loc, style):
         gt = (
             GT(polars_result_df)
             .fmt_image(
-                columns="team_icon_path", 
-                path="../src/hoop_stats/library/team_images",
+                columns="TEAM", 
+                path="../src/wood_ball/library/team_images",
                 )
             .tab_style(
                 style=style.text(color="black", weight='bold'),
@@ -262,14 +339,14 @@ def _(trad_box_score_team_stats):
 
 
 @app.cell
-def _(
-    box_score_player_stats,
-    duckdb,
-    game_log_df,
-    png_ref,
-    trad_player_stats,
-):
-    pb_rel = duckdb.sql("""
+def _(icon_ref, pl):
+    png_ref = pl.DataFrame(icon_ref)
+    return (png_ref,)
+
+
+@app.cell
+def _(con):
+    pb_rel = con.sql("""
     select adv.game_id, 
     adv.team_id, 
     adv.player_id, 
@@ -296,8 +373,8 @@ def _(
     concat(cast(round(ts_pct * 100, 2) as string), '%') as TS_PCT,
     trad.plus_minus,
     cast(trad.pts + 0.4 * trad.FGM - 0.7 * trad.FGA - 0.4*(trad.FTA - trad.FTM) + 0.7 * trad.OREB + 0.3 * trad.DREB + trad.STL + 0.7 * trad.AST + 0.7 * trad.BLK - 0.4 * trad.PF - trad.TO as double) as GS
-    from box_score_player_stats as adv
-    join trad_player_stats as trad
+    from box_adv_players_df as adv
+    join box_trad_players_df as trad
     on adv.game_id = trad.game_id and adv.team_id = trad.team_id and adv.player_id = trad.player_id
     join game_log_df as gl
     on gl.team_id = adv.team_id and gl.game_id = adv.game_id
@@ -318,6 +395,8 @@ def _(mo, pb_rel):
             team_icon_path as TEAM,
             player_name as PLAYER,
             MIN_STRING as MIN,
+            game_date,
+            matchup,
             pts,
             reb, 
             oreb,
@@ -332,6 +411,7 @@ def _(mo, pb_rel):
             ts_pct as TS,
             GS
         from pb_rel
+        order by GS desc
         limit 15
         """,
         output=False,
@@ -340,8 +420,14 @@ def _(mo, pb_rel):
 
 
 @app.cell
-def _(create_great_table, df):
-    create_great_table(df)
+def _(final_rel):
+    final_rel.limit(10)
+    return
+
+
+@app.cell
+def _(create_great_table, final_rel):
+    create_great_table(final_rel.limit(10))
     return
 
 

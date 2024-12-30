@@ -2,7 +2,7 @@ import plotly.io as pio
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import numpy as np
-from lib.draw_plotly_court import draw_plotly_court
+from wood_ball.stats.draw_plotly_court import draw_plotly_court
 import pandas as pd
 
 # this is all assumming we are using the nba_api shot chart detail data
@@ -34,14 +34,14 @@ def hex_shot_chart(player_name: str, player_id: str, team_id: str, player_info: 
     # cluster by shots attempted
     shots_hex = plt.hexbin(
         bi['LOC_X'], bi['LOC_Y'],
-        extent=(-250, 250, 422.5, -47.5), cmap='Blues', gridsize=gridsize)
+        extent=(-250, 250, -47.5, 422.5), cmap='Blues', gridsize=gridsize)
     plt.close()  # this closes the plot window
 
     # cluster by shots made
     makes_df = bi[bi['SHOT_MADE_FLAG'] == 1]
     makes_hex = plt.hexbin(
         makes_df['LOC_X'], makes_df['LOC_Y'],
-        extent=(-250, 250, 422.5, -47.5), cmap=plt.cm.Reds, gridsize=gridsize)
+        extent=(-250, 250, -47.5, 422.5), cmap=plt.cm.Reds, gridsize=gridsize)
     plt.close()
 
     # calculate shot accuracy
@@ -85,6 +85,7 @@ def hex_shot_chart(player_name: str, player_id: str, team_id: str, player_info: 
         ),
         text=[f'FGA: {sc}, FG_PCT: {ac}' for sc, ac in zip(shot_count_hex, accs_by_hex)],  # Add this line
     ))
+
     fig.update_layout(
         template='nba_stats',
         width = 500,

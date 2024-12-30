@@ -12,3 +12,5 @@ con.sql("""
 INSERT OR REPLACE INTO nba_game_log
 select * from game_log_df
 """)
+
+con.close()
