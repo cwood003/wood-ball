@@ -1,20 +1,7 @@
-import duckdb
-import polars as pl
-from wood_ball.stats.nba_stats import NBA_Stats
-from pathlib import Path
+box_adv_player_query_string = """select GAME_ID,TEAM_ID,TEAM_ABBREVIATION,TEAM_CITY,PLAYER_ID,PLAYER_NAME,NICKNAME,START_POSITION,COMMENT,MIN,E_OFF_RATING,OFF_RATING,E_DEF_RATING,DEF_RATING,E_NET_RATING,NET_RATING,AST_PCT,AST_TOV,AST_RATIO,OREB_PCT,DREB_PCT,REB_PCT,TM_TOV_PCT,EFG_PCT,TS_PCT,USG_PCT,E_USG_PCT,E_PACE,PACE,PACE_PER40,POSS,PIE"""
 
-# from wood_ball.library.static.icon_ref import icon_ref
-
-stats = NBA_Stats()
-
-# con = duckdb.connect('md:?motherduck_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN3b29kMDEwN0BnbWFpbC5jb20iLCJzZXNzaW9uIjoiY3dvb2QwMTA3LmdtYWlsLmNvbSIsInBhdCI6IkhOVTBDdlBpdVh2VzJqeU80UnExV3RMUm1RN09FVTRybEowanhSV2ZMVDQiLCJ1c2VySWQiOiIwYTMzZGI5OC0xZGY1LTQxY2QtODRkOC0zZDAxNGU5NmFlZTUiLCJpc3MiOiJtZF9wYXQiLCJyZWFkT25seSI6ZmFsc2UsInRva2VuVHlwZSI6InJlYWRfd3JpdGUiLCJpYXQiOjE3MzUzOTkzMDN9.tK3gEbSK3Gpn5YtdIyqYd6ZNA2kMnU-re3Ew-RsgzQQ')
-# con = duckdb.connect('nba_data.duckdb')
-p = Path('X:/nba_data/my_db.duckdb').resolve()
-con = duckdb.connect(p)
-# box_adv_player
-con.execute("""
-    CREATE OR REPLACE TABLE nba_data.box_adv_player (
-    GAME_ID STRING,
+create_box_adv_player_table = """
+GAME_ID STRING,
     TEAM_ID STRING,
     TEAM_ABBREVIATION STRING,
     TEAM_CITY STRING,
@@ -47,12 +34,41 @@ con.execute("""
     POSS BIGINT,
     PIE DOUBLE,
     PRIMARY KEY(GAME_ID, TEAM_ID, PLAYER_ID)
-)
-            """)
+    """
 
-# box_adv_team
-con.execute("""
-    CREATE OR REPLACE TABLE nba_data.box_adv_team (
+box_adv_team_query_string = """select 
+GAME_ID,
+    TEAM_ID,
+    TEAM_NAME,
+    TEAM_ABBREVIATION,
+    TEAM_CITY,
+    MIN,
+    E_OFF_RATING,
+    OFF_RATING,
+    E_DEF_RATING,
+    DEF_RATING,
+    E_NET_RATING,
+    NET_RATING,
+    AST_PCT,
+    AST_TOV,
+    AST_RATIO,
+    OREB_PCT,
+    DREB_PCT,
+    REB_PCT,
+    E_TM_TOV_PCT,
+    TM_TOV_PCT,
+    EFG_PCT,
+    TS_PCT,
+    USG_PCT,
+    E_USG_PCT,
+    E_PACE,
+    PACE,
+    PACE_PER40,
+    POSS,
+    PIE
+    """
+
+create_box_adv_team_table = """
     GAME_ID STRING,
     TEAM_ID STRING,
     TEAM_NAME STRING,
@@ -83,11 +99,40 @@ con.execute("""
     POSS BIGINT,
     PIE DOUBLE,
     PRIMARY KEY(GAME_ID, TEAM_ID)
-            )
-            """)
-# box trad player
-con.execute("""
-    CREATE OR REPLACE TABLE nba_data.box_trad_player (
+"""
+box_trad_player_query_string = """
+select GAME_ID,
+    TEAM_ID,
+    TEAM_ABBREVIATION,
+    TEAM_CITY,
+    PLAYER_ID,
+    PLAYER_NAME,
+    NICKNAME,
+    START_POSITION,
+    COMMENT,
+    MIN,
+    FGM,
+    FGA,
+    FG_PCT,
+    FG3M,
+    FG3A,
+    FG3_PCT,
+    FTM,
+    FTA,
+    FT_PCT,
+    OREB,
+    DREB,
+    REB,
+    AST,
+    STL,
+    BLK,
+    "TO" as TOV,
+    PF,
+    PTS,
+    PLUS_MINUS
+"""
+
+create_box_trad_player_table = """
     GAME_ID STRING,
     TEAM_ID STRING,
     TEAM_ABBREVIATION STRING,
@@ -118,12 +163,38 @@ con.execute("""
     PTS BIGINT,
     PLUS_MINUS DOUBLE,
     PRIMARY KEY(GAME_ID, TEAM_ID, PLAYER_ID)
-    )
-""")
+"""
 
-# box trad team
-con.execute("""
-    CREATE OR REPLACE TABLE nba_data.box_trad_team (
+box_trad_team_query_string = """
+select 
+GAME_ID,
+    TEAM_ID,
+    TEAM_NAME,
+    TEAM_ABBREVIATION,
+    TEAM_CITY,
+    MIN,
+    FGM,
+    FGA,
+    FG_PCT,
+    FG3M,
+    FG3A,
+    FG3_PCT,
+    FTM,
+    FTA,
+    FT_PCT,
+    OREB,
+    DREB,
+    REB,
+    AST,
+    STL,
+    BLK,
+    "TO" as TOV,
+    PF,
+    PTS,
+    PLUS_MINUS
+"""
+
+create_box_trad_team_table = """
     GAME_ID STRING,
     TEAM_ID STRING,
     TEAM_NAME STRING,
@@ -150,12 +221,9 @@ con.execute("""
     PTS BIGINT,
     PLUS_MINUS DOUBLE,
     PRIMARY KEY(GAME_ID, TEAM_ID)
-        )
-            """)
+"""
 
-# nba_game_log
-con.execute("""
-    CREATE OR REPLACE TABLE nba_data.nba_game_log (
+create_nba_game_log_table = """
     SEASON_ID STRING,
     TEAM_ID STRING,
     TEAM_ABBREVIATION STRING,
@@ -186,7 +254,4 @@ con.execute("""
     PLUS_MINUS BIGINT,
     VIDEO_AVAILABLE BIGINT,
     PRIMARY KEY(SEASON_ID, TEAM_ID, GAME_ID)
-            )
-            """)
-
-con.close()
+"""
