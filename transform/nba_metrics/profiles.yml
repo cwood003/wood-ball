@@ -1,0 +1,11 @@
+nba_metrics:
+  outputs:
+    dev:
+      type: duckdb
+      path: X:/nba_data/my_db.duckdb
+      threads: 1
+    # prod:
+    #   type: duckdb
+    #   path: "md:{{ var('database_name', 'duckdb_stats') }}"
+    #   threads: 1
+  target: dev

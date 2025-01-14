@@ -1,0 +1,10 @@
+sources:
+  - name: nba_data
+    database: my_db
+    schema: nba_data
+    tables:
+      - name: box_adv_player
+      - name: box_adv_team
+      - name: box_trad_player
+      - name: box_trad_team
+      - name: nba_game_log

@@ -1,0 +1,46 @@
+[0m10:06:06.539929 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000023A57F02DE0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000023A57F02900>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000023A57F02930>]}
+
+
+============================== 10:06:06.567545 | 51ae1ad8-28dd-42ed-92a3-a0572f3c04d9 ==============================
+[0m10:06:06.567545 [info ] [MainThread]: Running with dbt=1.9.1
+[0m10:06:06.568545 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': 'C:\\Users\\cwood\\.dbt', 'fail_fast': 'False', 'version_check': 'True', 'log_path': 'logs', 'debug': 'False', 'warn_error': 'None', 'use_colors': 'True', 'use_experimental_parser': 'False', 'empty': 'None', 'quiet': 'False', 'no_print': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'invocation_command': 'dbt init nba_metrics', 'static_parser': 'True', 'introspect': 'True', 'target_path': 'None', 'log_format': 'default', 'send_anonymous_usage_stats': 'True'}
+[0m10:06:06.625153 [warn ] [MainThread]: [ConfigFolderDirectory]: Unable to parse logging event dictionary. Failed to parse dir field: expected string or bytes-like object, got 'WindowsPath'.. Dictionary: {'dir': WindowsPath('C:/Users/cwood/.dbt')}
+[0m10:06:06.625153 [info ] [MainThread]: Creating dbt configuration folder at 
+[0m10:06:06.628155 [debug] [MainThread]: Starter project path: C:\Users\cwood\Documents\bball_proj\wood-ball\.venv\Lib\site-packages\dbt\include\starter_project
+[0m10:06:06.645153 [info ] [MainThread]: 
+Your new dbt project "nba_metrics" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m10:06:06.647153 [info ] [MainThread]: Setting up your profile.
+[0m10:06:19.260075 [info ] [MainThread]: Profile nba_metrics written to C:\Users\cwood\.dbt\profiles.yml using target's sample configuration. Once updated, you'll be able to start developing with dbt.
+[0m10:06:19.261074 [debug] [MainThread]: Command `dbt init` succeeded at 10:06:19.261074 after 12.82 seconds
+[0m10:06:19.262075 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000023A57BA5EB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000023A57AE36E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000023A5939BDA0>]}
+[0m10:06:19.262075 [debug] [MainThread]: Flushing usage events
+[0m10:06:19.625794 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m14:50:02.130919 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000223C54B0470>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000223C55592B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000223C54B02C0>]}
+
+
+============================== 14:50:02.134917 | 9a38cc26-824c-4a01-a440-9100a233c9c7 ==============================
+[0m14:50:02.134917 [info ] [MainThread]: Running with dbt=1.9.1
+[0m14:50:02.134917 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': 'C:\\Users\\cwood\\.dbt', 'fail_fast': 'False', 'debug': 'False', 'log_path': 'logs', 'warn_error': 'None', 'version_check': 'True', 'use_colors': 'True', 'use_experimental_parser': 'False', 'empty': 'False', 'quiet': 'False', 'no_print': 'None', 'log_format': 'default', 'static_parser': 'True', 'invocation_command': 'dbt build', 'introspect': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'send_anonymous_usage_stats': 'True'}
+[0m14:50:02.135919 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\cwood\Documents\bball_proj\wood-ball\transform\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m14:50:02.136918 [debug] [MainThread]: Command `dbt build` failed at 14:50:02.136918 after 0.11 seconds
+[0m14:50:02.136918 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000223C55592B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000223C53C8CB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000223C5827CE0>]}
+[0m14:50:02.136918 [debug] [MainThread]: Flushing usage events
+[0m14:50:02.489045 [debug] [MainThread]: An error was encountered while trying to flush usage events

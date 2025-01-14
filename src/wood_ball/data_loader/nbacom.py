@@ -31,7 +31,7 @@ class NBAComLoader:
             print(f'Using {local_db_path} as duckdb db path')
             self.con = duckdb.connect(f'{local_db_path}')
 
-    def load_data_to_duckdb(self, nba_data: List[Dict[any, any]], query_string: str, database: str = 'nba_data', table: str = 'None'):
+    def load_data_to_duckdb(self, nba_data: List[Dict[any, any]], query_string: str, schema: str = 'main', table: str = 'None'):
         """Load any of the standard python data structures of python data
             to selected duckdb database
 
@@ -50,13 +50,13 @@ class NBAComLoader:
         source_df = pl.DataFrame(nba_data)
 
         self.con.execute(f"""
-        INSERT OR REPLACE INTO {database}.{table} {query_string}
+        INSERT OR REPLACE INTO {schema}.{table} {query_string}
         from source_df
             """)
     
-    def create_duckdb_tables(self, query_string: str, database: str = 'nba_data', table: str = 'None'):
+    def create_duckdb_tables(self, query_string: str, schema: str = 'main', table: str = 'None'):
         self.con.execute(f"""
-            CREATE TABLE IF NOT EXISTS {database}.{table}
+            CREATE TABLE IF NOT EXISTS {schema}.{table}
                          ({query_string})
                  """)
     
