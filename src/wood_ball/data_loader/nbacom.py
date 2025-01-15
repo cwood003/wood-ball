@@ -2,7 +2,11 @@ from wood_ball.stats.nba_stats import NBA_Stats
 import duckdb
 import polars as pl
 from typing import List, Dict 
+from nba_api.stats.endpoints import shotchartdetail, commonplayerinfo, teaminfocommon, boxscoreadvancedv2, leaguegamelog, boxscoretraditionalv2
+from nba_api.stats.static import players, teams
 import wood_ball.data_loader.data_load_strings as data_load_strings
+from rich.progress import track
+import time
 
 class NBAComLoader:
     """
@@ -20,6 +24,7 @@ class NBAComLoader:
         self.motherduck_token = motherduck_token
         self.local_db_path = local_db_path
         self.nba_client = NBA_Stats()
+        self.loop_rest_time = .25
 
         # may need to modify this to try except
         if motherduck_token != "":
@@ -79,7 +84,7 @@ class NBAComLoader:
         
         game_log_df = self.con.execute(
             """
-        select * from nba_data.nba_game_log
+        select * from main.nba_game_log
         where GAME_DATE between CAST(? as DATE) and CAST(? as DATE)
         """,
             [date_from, date_to], # modify before running for now
@@ -88,10 +93,14 @@ class NBAComLoader:
         game_id_list = game_log_df["GAME_ID"].unique().to_list()
         print('Game ID list pulled, using to get box scores now...')
 
-        box_adv_players, box_adv_team = self.nba_client.get_box_scores(game_id_list, 'adv')
-        print('Advanced box scores pulled into objects.')
-        box_trad_players, box_trad_team = self.nba_client.get_box_scores(game_id_list, 'trad')
-        print('Tradititional box scores pulled into objects.')
+        # using nba_api to load here rather than creating an unecessary module
+        box_score_advanced_obj_list = [boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id) for game_id in track(game_id_list, description="Advanced Box Score stats...") if time.sleep(self.loop_rest_time)]
+        box_adv_team = [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
+        box_adv_players = [player_stats for box_score in box_score_advanced_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
+
+        trad_box_score_obj_list = [boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id) for game_id in track(game_id_list, description="Traditional Box Score Stats...") if time.sleep(self.loop_rest_time)]
+        box_trad_players = [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["PlayerStats"]]
+        box_trad_team = [player_stats for box_score in trad_box_score_obj_list for player_stats in box_score.get_normalized_dict()["TeamStats"]]
 
         print('Creating box_adv_player table if not already exists.')
         # box adv player

@@ -52,20 +52,40 @@ def _(data_loader):
 
 
 @app.cell
-def _(data_load_strings, data_loader):
-    data_loader.create_duckdb_tables(query_string=data_load_strings.create_nba_game_log_table, table='nba_game_log')
-    return
-
-
-@app.cell
 def _(data_loader):
-    data_loader.load_box_scores(date_from='2025-01-13', date_to='2025-01-14')
+    data_loader.load_box_scores(date_from='2025-01-08', date_to='2025-01-10')
     return
 
 
 @app.cell
 def _(data_loader):
     del data_loader.con
+    return
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        ATTACH 'X:/nba_data/my_db.duckdb' as nba_data;
+        """
+    )
+    return (nba_data,)
+
+
+@app.cell
+def _(mo, nba_data, nba_game_log):
+    test_df = mo.sql(
+        f"""
+        select * from nba_data.main.nba_game_log
+        """
+    )
+    return (test_df,)
+
+
+@app.cell
+def _(mo, test_df):
+    mo.ui.dataframe(test_df, page_size=15)
     return
 
 

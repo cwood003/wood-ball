@@ -25,6 +25,9 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[project.scripts]
+demo-app = "wood_ball.test_cli:app"
+
 [dependency-groups]
 dev = [
     "marimo>=0.10.4",
