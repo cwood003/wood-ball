@@ -13,3 +13,6 @@ wheels/
 duckdb.exe
 
 *.duckdb
+
+#ruff cache
+.ruff_cache

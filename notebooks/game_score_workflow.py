@@ -21,8 +21,12 @@ def _():
     from wood_ball.library.static.icon_ref import icon_ref
     from wood_ball.stats.nba_stats import NBA_Stats
     from wood_ball.data_loader.nbacom import NBAComLoader, data_load_strings
+    from whenever import Date, Instant, LocalDateTime
     return (
+        Date,
         GT,
+        Instant,
+        LocalDateTime,
         NBAComLoader,
         NBA_Stats,
         Path,
@@ -40,30 +44,6 @@ def _():
 
 
 @app.cell
-def _(NBAComLoader):
-    data_loader = NBAComLoader(local_db_path='X:/nba_data/my_db.duckdb')
-    return (data_loader,)
-
-
-@app.cell
-def _(data_loader):
-    data_loader.con.sql('show all tables')
-    return
-
-
-@app.cell
-def _(data_loader):
-    data_loader.load_box_scores(date_from='2025-01-08', date_to='2025-01-10')
-    return
-
-
-@app.cell
-def _(data_loader):
-    del data_loader.con
-    return
-
-
-@app.cell
 def _(mo):
     _df = mo.sql(
         f"""
@@ -71,6 +51,16 @@ def _(mo):
         """
     )
     return (nba_data,)
+
+
+@app.cell
+def _(mo):
+    _df = mo.sql(
+        f"""
+        show all tables
+        """
+    )
+    return
 
 
 @app.cell

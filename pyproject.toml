@@ -17,8 +17,8 @@ dependencies = [
     "plotly>=5.24.1",
     "polars>=1.17.1",
     "pyarrow>=18.1.0",
-    "rich>=13.9.4",
     "typer>=0.15.1",
+    "whenever>=0.6.16",
 ]
 
 [build-system]
@@ -26,12 +26,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-demo-app = "wood_ball.test_cli:app"
+wood-ball = "wood_ball.cli.cli:app"
 
 [dependency-groups]
 dev = [
+    "harlequin>=1.25.2",
     "marimo>=0.10.4",
     "nba-on-court>=0.2.1",
-    "ruff>=0.8.3",
     "wat-inspector>=0.4.3",
 ]
