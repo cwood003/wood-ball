@@ -1,0 +1,7 @@
+default_profile = "Cole"
+[profiles.Cole]
+adapter = "duckdb"
+theme = "dracula"
+limit = 100000
+keymap_name = ["vscode"]
+conn_str = ['X:/nba_data/my_db.duckdb']
