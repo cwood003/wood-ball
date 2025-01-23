@@ -1,4 +1,4 @@
-from wood_ball.stats.nba_stats import NBA_Stats
+from wood_ball.stats.nba.nba_stats import NBA_Stats
 import duckdb
 import polars as pl
 from typing import List, Dict 
@@ -13,7 +13,7 @@ class NBAComLoader:
     """
     A class that will load nba to users Motherduck account or to a local duckdb of the users choosing
     """
-    def __init__(self, motherduck_token: str = "", local_db_path: str = ':memory:'):
+    def __init__(self, motherduck_token: str = "", local_db_path: str = ':memory:', duckdb_connection=None):
         """
         Initialize the motherduck token and local duckdb path
 
@@ -23,21 +23,23 @@ class NBAComLoader:
         """
         
         # self.connection_string
-        self.nba_client = NBA_Stats()
-        self.loop_rest_time = .25
+        self.loop_rest_time = .15
 
         print("[dark_orange]<-------NBAComLoader------------------------------->[/dark_orange]")
         # may need to modify this to try except
-        if motherduck_token != "":
+        if duckdb_connection is not None:
+            self.con = duckdb_connection
+        elif motherduck_token != "":
             self.duck_connection_string = f'md:?motherduck_token={motherduck_token}'
+            self.con = duckdb.connect(f'{self.duck_connection_string}')
         elif local_db_path == ':memory:':
             self.duck_connection_string = local_db_path
             print('Using in-memory duckdb database')
+            self.con = duckdb.connect(f'{self.duck_connection_string}')
         elif local_db_path != ':memory:':
             self.duck_connection_string = local_db_path
             print(f'Using {local_db_path} as duckdb db path')
-
-        self.con = duckdb.connect(f'{self.duck_connection_string}')
+            self.con = duckdb.connect(f'{self.duck_connection_string}')
 
     def load_data_to_duckdb(self, nba_data: List[Dict[any, any]], query_string: str, schema: str = 'main', table: str = 'None'):
         """Load any of the standard python data structures of python data
@@ -76,7 +78,7 @@ class NBAComLoader:
                          ({query_string})
                  """)
     
-    def load_box_scores(self, date_from: str, date_to: str):
+    def load_box_scores(self, date_from: str, date_to: str, season_type_all_star: str = "Regular Season",):
         """Method to load box scores, have to load game logs to load box scored
 
         Args:
@@ -84,7 +86,11 @@ class NBAComLoader:
             date_to (str): Example value '2025-10-01'.
         """
 
-        game_log = self.nba_client.get_game_log(date_from=date_from, date_to=date_to)
+        game_log = leaguegamelog.LeagueGameLog(
+            season_type_all_star=season_type_all_star,
+            date_from_nullable=date_from,
+            date_to_nullable=date_to,            
+        ).get_normalized_dict()["LeagueGameLog"]
         # load game log
         self.create_duckdb_tables(query_string=data_load_strings.create_nba_game_log_table, table='nba_game_log')
         self.load_data_to_duckdb(

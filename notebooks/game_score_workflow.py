@@ -19,7 +19,7 @@ def _():
     import wat
     from great_tables import GT, style, loc, google_font
     from wood_ball.library.static.icon_ref import icon_ref
-    from wood_ball.stats.nba_stats import NBA_Stats
+    from wood_ball.stats.nba.nba_stats import NBA_Stats
     from wood_ball.data_loader.nbacom import NBAComLoader, data_load_strings
     from whenever import Date, Instant, LocalDateTime
     return (

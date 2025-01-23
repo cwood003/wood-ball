@@ -5,11 +5,167 @@ import wood_ball.stats.draw_hex_chart as draw_hex_chart
 from rich.panel import Panel
 from rich.text import Text
 from rich.console import Console
+import duckdb
+from whenever import Instant
+from great_tables import GT, style, loc, google_font
+from wood_ball.library.static.icon_ref import icon_ref
+import polars as pl
+from wood_ball.data_loader.nbacom import NBAComLoader
+import wood_ball.stats.nba.duckdb_query_strings as duckdb_query_strings
 
 class NBA_Stats:
     """
     A class that provides methods to retrieve NBA player statistics and shot charts.
     """
+    def __init__(self, motherduck_token: str = "", local_db_path: str = ':memory:'):
+        """
+        Initialize the motherduck token and local duckdb path
+
+        Args:
+            motherduck_token (str): motherduck token to be used to load data to motherduck
+            local_db_path (str, optional): the local duckdb path to load the data to. Defaults to ':memory:' which means all data will be lost when python process is exited.
+        """
+        
+        # self.connection_string
+        # print("[dark_orange]<-------NBAComLoader------------------------------->[/dark_orange]")
+        # may need to modify this to try except
+        self.use_existing_data = False
+
+        if motherduck_token != "":
+            self.duck_connection_string = f'md:?motherduck_token={motherduck_token}'
+            self.use_existing_data = True
+        elif local_db_path == ':memory:':
+            self.duck_connection_string = local_db_path
+            print('Using in-memory duckdb database')
+        elif local_db_path != ':memory:':
+            self.duck_connection_string = local_db_path
+            self.use_existing_data = True
+            print(f'Using {local_db_path} as duckdb db path')
+
+        self.con = duckdb.connect(f'{self.duck_connection_string}')
+    
+    def create_great_table(self, data, background_color="#f6eee3"):
+
+            polars_result_df = data
+
+            background_color = background_color
+            gt = (
+                GT(polars_result_df)
+                .fmt_image(
+                    columns="TEAM", 
+                    path="src/wood_ball/library/team_images",
+                    )
+                .tab_style(
+                    style=style.text(color="black", weight='bold'),
+                    locations=loc.column_labels()
+                )
+                .tab_style(
+                    style=style.borders(sides='top', style="dashed"),
+                    locations = loc.body()
+                )
+                .opt_table_font(
+                    font=google_font(name="Montoserrat")
+                )
+                .tab_options(
+                    # container_width = "100%",
+                    table_background_color=background_color,
+                    # heading_border_bottom_color='black',
+                    # table_border_top_color ='black',
+                    column_labels_border_bottom_color='black',
+                    # column_labels_border_bottom_style="solid",
+                    # column_labels_border_bottom_width="10px",
+                    # table_font_style="italic",
+                    table_border_bottom_color='black'
+                )
+                # .data_color(
+                #     columns="GS",
+                #     palette="RdYlGn"
+                # )
+            )
+            return gt
+    
+    def best_of_yesterday(
+            self, 
+            date_from: str = str(Instant.now().to_tz('US/Eastern').date().subtract(days=1)), 
+            date_to: str = str(Instant.now().to_tz('US/Eastern').date())
+            ):
+        """Create best of yesterday great table
+
+        Args:
+            date_from (str, optional): _description_. Defaults to yesterday's date ET.
+            date_to (str, optional): _description_. Defaults to today's date ET.
+
+        Returns:
+            gt: great table
+        """ 
+        
+        png_ref = pl.DataFrame(icon_ref)
+
+        match self.use_existing_data:
+            case True:
+                pl_df = self.con.execute("""select     
+                                 team_icon_path as TEAM, 
+                                 player_name as PLAYER,
+                                 MIN_STRING as MIN, 
+                                 game_date,
+                                 matchup,
+                                 pts,
+                                 reb, 
+                                 oreb,
+                                 ast,
+                                 TOV,
+                                 stl,
+                                 blk,
+                                 pf,
+                                 fg,
+                                 fg_3pt,
+                                 usg_pct as USG,
+                                 s_pct as TS,
+                                 GS
+                                 from main.best_of_yesterday_prep as boy
+                                 join png_ref on boy.team_id = png_ref.team_id
+                                 where GAME_DATE between CAST(? as DATE) and CAST(? as DATE)
+                                 order by GS desc
+                                 limit 25
+                                 """, [date_from, date_to]
+                                 ).pl()
+                return self.create_great_table(pl_df)
+            
+            case False:
+                data_loader = NBAComLoader(duckdb_connection=self.con)
+                data_loader.load_box_scores(date_from=date_from, date_to=date_to)
+
+                pl_df = self.con.execute(
+                    f""" 
+                    with prep as ({duckdb_query_strings.best_of_yesterday_prep})
+                    select     
+                        team_icon_path as TEAM, 
+                        player_name as PLAYER,
+                        MIN_STRING as MIN, 
+                        game_date,
+                        matchup,
+                        pts,
+                        reb, 
+                        oreb,
+                        ast,
+                        TOV,
+                        stl,
+                        blk,
+                        pf,
+                        fg,
+                        fg_3pt,
+                        usg_pct as USG,
+                        s_pct as TS,
+                        GS
+                        from main.best_of_yesterday_prep as boy
+                        join png_ref on boy.team_id = png_ref.team_id
+                        where GAME_DATE between CAST(? as DATE) and CAST(? as DATE)
+                        order by GS desc
+                        limit 25
+                    """, [date_from, date_to]
+                )
+                return self.create_great_table(pl_df)
+
 
     def get_player_info(self, player_name):
         """
