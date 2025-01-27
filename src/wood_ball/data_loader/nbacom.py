@@ -1,4 +1,3 @@
-from wood_ball.stats.nba.nba_stats import NBA_Stats
 import duckdb
 import polars as pl
 from typing import List, Dict 
