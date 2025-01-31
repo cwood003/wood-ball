@@ -29,7 +29,7 @@ class NBAComLoader:
         if duckdb_connection is not None:
             self.con = duckdb_connection
         elif motherduck_token != "":
-            self.duck_connection_string = f'md:?motherduck_token={motherduck_token}'
+            self.duck_connection_string = f'md:nba_data?motherduck_token={motherduck_token}'
             self.con = duckdb.connect(f'{self.duck_connection_string}')
         elif local_db_path == ':memory:':
             self.duck_connection_string = local_db_path

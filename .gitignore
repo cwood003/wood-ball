@@ -16,3 +16,5 @@ duckdb.exe
 
 #ruff cache
 .ruff_cache
+
+src/wood_ball/data_loader/md_token.py
