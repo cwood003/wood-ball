@@ -30,13 +30,16 @@ class NBAComLoader:
             self.con = duckdb_connection
         elif motherduck_token != "":
             self.duck_connection_string = f'md:nba_data?motherduck_token={motherduck_token}'
+            self.db_display_name = 'md:nba_data'
             self.con = duckdb.connect(f'{self.duck_connection_string}')
         elif local_db_path == ':memory:':
             self.duck_connection_string = local_db_path
+            self.db_display_name = local_db_path
             print('Using in-memory duckdb database')
             self.con = duckdb.connect(f'{self.duck_connection_string}')
         elif local_db_path != ':memory:':
             self.duck_connection_string = local_db_path
+            self.db_display_name = local_db_path
             print(f'Using {local_db_path} as duckdb db path')
             self.con = duckdb.connect(f'{self.duck_connection_string}')
 
@@ -101,7 +104,7 @@ class NBAComLoader:
         game_log_df = self.con.execute(
             """
         select * from main.nba_game_log
-        where GAME_DATE between CAST(? as DATE) and CAST(? as DATE)
+        where CAST(GAME_DATE as DATE) between CAST(? as DATE) and CAST(? as DATE)
         """,
             [date_from, date_to], # modify before running for now
         ).pl()
@@ -162,5 +165,5 @@ class NBAComLoader:
             table=table_name
             )
         
-        print(f"[bold magenta]Box Scores (advanced player/team, traditional player/team)[/bold magenta] have been loaded to [bold dark_orange]{self.duck_connection_string}[/bold dark_orange]")
+        print(f"[bold magenta]Box Scores (advanced player/team, traditional player/team)[/bold magenta] have been loaded to [bold dark_orange]{self.db_display_name}[/bold dark_orange]")
         print("[dark_orange]<-------NBAComLoader------------------------------->[/dark_orange]")
