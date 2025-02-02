@@ -11,8 +11,9 @@ wheels/
 
 # duckdb.exe
 duckdb.exe
-
+duckdb
 *.duckdb
+nba_data
 
 #ruff cache
 .ruff_cache

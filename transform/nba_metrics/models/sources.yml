@@ -1,6 +1,6 @@
 sources:
   - name: nba_data
-    database: my_db
+    database: nba_data
     schema: main
     tables:
       - name: box_adv_player

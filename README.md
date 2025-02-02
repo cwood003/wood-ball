@@ -7,3 +7,9 @@
 4. Publish streamlit app to community hosting website with these visualizations with pipelines built to populate on button press (or command typing)
 5. Should I use DLT to load data in a seperate codebase? No, buzzword stuff not needed for my project. Do stuff with polars and duckdb forget about the rest
 6. Should I create a seperate codebase for the streamlit app?
+
+Notes:
+Activating python env in ghostty
+"source .venv/bin/activate"
+
+have to move into transform folder before running dbt
