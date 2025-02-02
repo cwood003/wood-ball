@@ -32,7 +32,7 @@ class NBA_Stats:
         self.use_existing_data = False
 
         if motherduck_token != "":
-            self.duck_connection_string = f'md:?motherduck_token={motherduck_token}'
+            self.duck_connection_string = f'md:nba_data?motherduck_token={motherduck_token}'
             self.use_existing_data = True
         elif local_db_path == ':memory:':
             self.duck_connection_string = local_db_path
@@ -120,11 +120,11 @@ class NBA_Stats:
                                  fg,
                                  fg_3pt,
                                  usg_pct as USG,
-                                 s_pct as TS,
+                                 ts_pct as TS,
                                  GS
                                  from main.best_of_yesterday_prep as boy
                                  join png_ref on boy.team_id = png_ref.team_id
-                                 where GAME_DATE between CAST(? as DATE) and CAST(? as DATE)
+                                 where CAST(GAME_DATE as DATE) between CAST(? as DATE) and CAST(? as DATE)
                                  order by GS desc
                                  limit 25
                                  """, [date_from, date_to]
@@ -154,16 +154,16 @@ class NBA_Stats:
                         pf,
                         fg,
                         fg_3pt,
-                        usg_pct as USG,
-                        s_pct as TS,
+                        USG_PCT as USG,
+                        TS_PCT,
                         GS
-                        from main.best_of_yesterday_prep as boy
+                        from prep as boy
                         join png_ref on boy.team_id = png_ref.team_id
-                        where GAME_DATE between CAST(? as DATE) and CAST(? as DATE)
+                        where CAST(GAME_DATE as DATE) between CAST(? as DATE) and CAST(? as DATE)
                         order by GS desc
-                        limit 25
+                        limit 20
                     """, [date_from, date_to]
-                )
+                ).pl()
                 return self.create_great_table(pl_df)
 
 

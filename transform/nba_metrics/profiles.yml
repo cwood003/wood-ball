@@ -2,7 +2,7 @@ nba_metrics:
   outputs:
     dev:
       type: duckdb
-      path: /home/colewood/Documents/bball_proj/wood-ball/nba_data.duckdb
+      path: /home/colewood/Documents/bball_proj/wood-ball/nba_data.duckdb #example local db location
       threads: 1
     prod:
       type: duckdb

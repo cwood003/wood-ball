@@ -17,57 +17,31 @@ def _():
     import plotly
     import marimo as mo
     import wat
-    from great_tables import GT, style, loc, google_font
-    from wood_ball.library.static.icon_ref import icon_ref
+    # from great_tables import GT, style, loc, google_font
+    # from wood_ball.library.static.icon_ref import icon_ref
     from wood_ball.stats.nba.nba_stats import NBA_Stats
-    from wood_ball.data_loader.nbacom import NBAComLoader, data_load_strings
-    from whenever import Date, Instant, LocalDateTime
-    return (
-        Date,
-        GT,
-        Instant,
-        LocalDateTime,
-        NBAComLoader,
-        NBA_Stats,
-        Path,
-        data_load_strings,
-        duckdb,
-        google_font,
-        icon_ref,
-        loc,
-        mo,
-        pl,
-        plotly,
-        style,
-        wat,
-    )
+    # from wood_ball.data_loader.nbacom import NBAComLoader, data_load_strings
+    # from whenever import Date, Instant, LocalDateTime
+    return NBA_Stats, Path, duckdb, mo, pl, plotly, wat
 
 
 @app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        ATTACH 'X:/nba_data/my_db.duckdb' as nba_data;
-        """
-    )
-    return (nba_data,)
+def _(NBA_Stats):
+    stats = NBA_Stats()
+    return (stats,)
 
 
 @app.cell
-def _(mo):
-    _df = mo.sql(
-        f"""
-        show all tables
-        """
-    )
+def _(stats):
+    stats.best_of_yesterday()
     return
 
 
 @app.cell
-def _(mo, nba_data, nba_game_log):
+def _(mo):
     test_df = mo.sql(
         f"""
-        select * from nba_data.main.nba_game_log
+        sselect * from nba_data.main.nba_game_log
         """
     )
     return (test_df,)
